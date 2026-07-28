@@ -52,6 +52,39 @@ test("provides working links for every job card", async ({ page }) => {
   await expect(page.locator("#jobs-view")).toHaveClass(/active/);
 });
 
+test("shows complete detail statements for all 56 jobs", async ({ page }) => {
+  test.setTimeout(60_000);
+  await page.addStyleTag({ content: "html { scroll-behavior: auto !important; }" });
+
+  for (let index = 0; index < 56; index += 1) {
+    await page.locator(".job .job-link").nth(index).click();
+
+    await expect(
+      page.getByRole("heading", { name: "Key responsibilities" }),
+    ).toBeVisible();
+    await expect(
+      page
+        .locator(".detail-section")
+        .filter({ hasText: "Key responsibilities" })
+        .locator("li"),
+    ).toHaveCount(3);
+    await expect(
+      page
+        .locator(".detail-section")
+        .filter({ hasText: "Required qualifications" })
+        .locator("li"),
+    ).toHaveCount(3);
+    await expect(
+      page
+        .locator(".detail-section")
+        .filter({ hasText: "Preferred experience" })
+        .locator("li"),
+    ).toHaveCount(3);
+
+    await page.getByRole("link", { name: "Back to jobs" }).click();
+  }
+});
+
 test("searches by role and location", async ({ page }) => {
   await page.getByLabel("Role or skills").fill("Playwright");
   await page.getByLabel("Location").fill("Jersey City");
