@@ -6,8 +6,8 @@ test.beforeEach(async ({ page }) => {
 
 test("shows the recommended jobs on initial load", async ({ page }) => {
   await expect(page).toHaveTitle(/Dear Jobs/);
-  await expect(page.locator(".job")).toHaveCount(6);
-  await expect(page.locator("#resultCount")).toHaveText("6 matches");
+  await expect(page.locator(".job")).toHaveCount(56);
+  await expect(page.locator("#resultCount")).toHaveText("56 matches");
   await expect(page.getByRole("heading", { name: "Senior SDET" })).toBeVisible();
 });
 
@@ -27,25 +27,25 @@ test("applies and toggles a quick filter", async ({ page }) => {
 
   await remoteFilter.click();
   await expect(remoteFilter).toHaveClass(/active/);
-  await expect(page.locator(".job")).toHaveCount(2);
-  await expect(page.locator("#resultCount")).toHaveText("2 matches");
+  await expect(page.locator(".job")).toHaveCount(12);
+  await expect(page.locator("#resultCount")).toHaveText("12 matches");
 
   await remoteFilter.click();
   await expect(remoteFilter).not.toHaveClass(/active/);
-  await expect(page.locator(".job")).toHaveCount(6);
+  await expect(page.locator(".job")).toHaveCount(56);
 });
 
 test("clears search values and active filters", async ({ page }) => {
   await page.getByLabel("Role or skills").fill("Java");
   await page.getByRole("button", { name: "Hybrid", exact: true }).click();
   await page.getByRole("button", { name: "Search Jobs" }).click();
-  await expect(page.locator(".job")).toHaveCount(1);
+  await expect(page.locator(".job")).toHaveCount(6);
 
   await page.getByRole("button", { name: "Clear filters" }).click();
 
   await expect(page.getByLabel("Role or skills")).toHaveValue("");
   await expect(page.locator(".chip.active")).toHaveCount(0);
-  await expect(page.locator(".job")).toHaveCount(6);
+  await expect(page.locator(".job")).toHaveCount(56);
 });
 
 test("saves a job and shows only saved jobs", async ({ page }) => {
