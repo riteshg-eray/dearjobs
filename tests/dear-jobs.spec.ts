@@ -76,6 +76,44 @@ test("applies and toggles a quick filter", async ({ page }) => {
   await expect(page.locator(".job")).toHaveCount(56);
 });
 
+test("separates work authorization from H-1B transfer eligibility", async ({
+  page,
+}) => {
+  const seniorSdet = page.locator(".job").filter({ hasText: "Senior SDET" });
+  await expect(seniorSdet.locator(".eligibility")).toContainText(
+    "H-1B transfer available",
+  );
+
+  const projectManager = page
+    .locator(".job")
+    .filter({ hasText: "Technical Project Manager" });
+  await expect(projectManager.locator(".eligibility")).toContainText(
+    "No H-1B sponsorship",
+  );
+
+  await page.getByRole("button", { name: "H-1B", exact: true }).click();
+  await expect(page.locator(".job")).not.toHaveCount(0);
+  await expect(
+    page.getByRole("heading", { name: "Senior SDET" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Full Stack Developer" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Technical Project Manager" }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole("heading", { name: "ERP Program Manager" }),
+  ).toHaveCount(0);
+
+  await page.getByRole("button", { name: "US Citizen", exact: true }).click();
+  await expect(page.locator(".job")).toHaveCount(56);
+  await page.getByRole("button", { name: "Green Card", exact: true }).click();
+  await expect(page.locator(".job")).toHaveCount(56);
+  await page.getByRole("button", { name: "EAD", exact: true }).click();
+  await expect(page.locator(".job")).toHaveCount(56);
+});
+
 test("clears search values and active filters", async ({ page }) => {
   await page.getByLabel("Role or skills").fill("Java");
   await page.getByRole("button", { name: "Hybrid", exact: true }).click();
