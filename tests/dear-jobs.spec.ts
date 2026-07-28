@@ -22,6 +22,36 @@ test("shows the recommended jobs on initial load", async ({ page }) => {
   );
 });
 
+test("provides working links for every job card", async ({ page }) => {
+  await expect(page.locator(".job .job-link")).toHaveCount(56);
+  await expect(page.locator(".job .company-link")).toHaveCount(56);
+  await expect(page.locator(".job .apply-link")).toHaveCount(56);
+  await expect(page.locator(".job .recruiter a[href^='mailto:']")).toHaveCount(56);
+
+  await page.locator(".job .job-link").first().click();
+  await expect(page.locator("#detail-view")).toHaveClass(/active/);
+  await expect(
+    page.getByRole("heading", { name: "Senior SDET", level: 1 }),
+  ).toBeVisible();
+
+  await page.getByRole("link", { name: "Company careers" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Northstar Financial", level: 1 }),
+  ).toBeVisible();
+
+  await page.getByRole("link", { name: "View Senior SDET" }).click();
+  await page.getByRole("link", { name: "Apply now" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Apply for Senior SDET", level: 1 }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "Start application email" }),
+  ).toHaveAttribute("href", /mailto:avery\.johnson@northstarfinancial\.example/);
+
+  await page.getByRole("link", { name: "Back to jobs" }).click();
+  await expect(page.locator("#jobs-view")).toHaveClass(/active/);
+});
+
 test("searches by role and location", async ({ page }) => {
   await page.getByLabel("Role or skills").fill("Playwright");
   await page.getByLabel("Location").fill("Jersey City");
