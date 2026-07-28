@@ -9,6 +9,17 @@ test("shows the recommended jobs on initial load", async ({ page }) => {
   await expect(page.locator(".job")).toHaveCount(56);
   await expect(page.locator("#resultCount")).toHaveText("56 matches");
   await expect(page.getByRole("heading", { name: "Senior SDET" })).toBeVisible();
+  const firstJob = page.locator(".job").first();
+  await expect(firstJob.locator(".description")).toContainText(
+    "Northstar Financial is seeking a Senior SDET",
+  );
+  await expect(firstJob.locator(".recruiter")).toContainText("Avery Johnson");
+  await expect(
+    firstJob.getByRole("link", { name: /Email Avery Johnson/ }),
+  ).toHaveAttribute(
+    "href",
+    "mailto:avery.johnson@northstarfinancial.example",
+  );
 });
 
 test("searches by role and location", async ({ page }) => {
