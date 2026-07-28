@@ -96,6 +96,32 @@ test("searches by role and location", async ({ page }) => {
   await expect(page.getByRole("status")).toHaveText("Search results updated");
 });
 
+test("suggests and selects available job locations", async ({ page }) => {
+  const location = page.getByRole("combobox", { name: "Location" });
+
+  await location.fill("New");
+  await expect(location).toHaveAttribute("aria-expanded", "true");
+  await expect(
+    page.getByRole("listbox", { name: "Available cities" }),
+  ).toBeVisible();
+  await expect(page.getByRole("option")).toHaveCount(3);
+
+  await page.getByRole("option", { name: /New York, NY/ }).click();
+  await expect(location).toHaveValue("New York, NY");
+  await expect(location).toHaveAttribute("aria-expanded", "false");
+
+  await page.getByRole("button", { name: "Search Jobs" }).click();
+  await expect(page.locator(".job")).toHaveCount(2);
+  await expect(page.locator("#resultCount")).toHaveText("2 matches");
+
+  await page.getByRole("button", { name: "Clear filters" }).click();
+  await location.fill("San");
+  await location.press("ArrowDown");
+  await location.press("Enter");
+  await expect(location).toHaveValue(/^San /);
+  await expect(location).toHaveAttribute("aria-expanded", "false");
+});
+
 test("applies and toggles a quick filter", async ({ page }) => {
   const remoteFilter = page.getByRole("button", { name: "Remote", exact: true });
 
